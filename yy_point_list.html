@@ -1,0 +1,263 @@
+<div ng-controller="pointListCtrl">
+	<div class="container">
+		<div class="weui-tab">
+			<div class="weui-navbar">
+				<div class="weui-navbar__item" ng-click="navSwitch(1)" ng-class="{'weui-bar__item_on': focusIndex==1}">全部</div>
+				<div class="weui-navbar__item" ng-click="navSwitch(2)" ng-class="{'weui-bar__item_on': focusIndex==2}">正常</div>
+				<div class="weui-navbar__item" ng-click="navSwitch(3)" ng-class="{'weui-bar__item_on': focusIndex==3}">故障<span ng-if="point_fault_count!=0" class="weui-badge">{{point_fault_count}}</span></div>
+			</div>
+			<div class="weui-tab__panel" ng-if="searDetail">
+				<div ng-if="focusIndex==1">
+					<a href="#!/pointDetail/id={{all.ID}}" class="weui-panel" ng-repeat="all in point_all">
+						<div class="weui-panel__hd">
+							<span ng-switch="all.tip">
+								<span class="c_org fr" ng-switch-when="正常">{{all.tip}}</span>
+								<span class="c_red fr" ng-switch-when="故障">{{all.tip}}</span>
+							</span>
+							{{all.MacName}}
+						</div>
+						<div class="weui-panel__bd">
+							<div class="panelList c_333 tac">
+								 <ul>
+									<li class="ptstock" ng-repeat="stock in all.stock">
+										<span>{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="weui-panel__ft">
+							<div class="weui-cell weui-cell_link fs14 c_999">						
+								<div class="weui-cell__bd">今日销售： <span class="c_333">{{all.today_sale.Q}}杯 &yen;{{all.today_sale.M}}</span></div>	
+								<div class="weui-cell__ft">七日销售： <span class="c_333">{{all.seven_sale.Q}}杯 &yen;{{all.seven_sale.M}}</span></div>
+							</div>
+						</div>
+					</a>
+				</div>
+
+				<div ng-if="focusIndex==2">
+					<a href="#!/pointDetail/id={{normal.ID}}" ng-click="mtDetail()" class="weui-panel" ng-repeat="normal in point_normal">
+						<div class="weui-panel__hd">
+							<span class="c_org fr">正常</span>
+							{{normal.MacName}}
+						</div>
+						<div class="weui-panel__bd">
+							<div class="panelList c_333 tac">
+								 <ul>
+									<li class="ptstock" ng-repeat="stock in normal.stock">
+										<span>{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="weui-panel__ft">
+							<div class="weui-cell weui-cell_link fs14 c_999">						
+								<div class="weui-cell__bd">今日销售： <span class="c_333">{{normal.today_sale.Q}}杯 &yen;{{normal.today_sale.M}}</span></div>	
+								<div class="weui-cell__ft">七日销售： <span class="c_333">{{normal.seven_sale.Q}}杯 &yen;{{normal.seven_sale.M}}</span></div>
+							</div>
+						</div>
+					</a>		
+				</div>
+
+				<div ng-if="focusIndex==3">
+					<a href="#!/pointDetail/id={{fault.ID}}" ng-click="mtDetail()" class="weui-panel" ng-repeat="fault in point_fault">
+						<div class="weui-panel__hd">
+							<span class="c_red fr">故障</span>
+							{{fault.MacName}}
+						</div>
+						<div class="weui-panel__bd">
+							<div class="panelList c_333 tac">
+								 <ul>
+									<li class="ptstock" ng-repeat="stock in fault.stock">
+										<span>{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="weui-panel__ft">
+							<div class="weui-cell weui-cell_link fs14 c_999">						
+								<div class="weui-cell__bd">今日销售： <span class="c_333">{{fault.today_sale.Q}}杯 &yen;{{fault.today_sale.M}}</span></div>	
+								<div class="weui-cell__ft">七日销售： <span class="c_333">{{fault.seven_sale.Q}}杯 &yen;{{fault.seven_sale.M}}</span></div>
+							</div>
+						</div>
+					</a>		
+				</div>
+
+				<div  infinite-scroll='ptLoad.nextPage()' infinite-scroll-disabled='ptLoad.busy' infinite-scroll-distance='1'>				 
+					 <a href="#!/pointDetail/id={{x.ID}}" ng-click="mtDetail()" class="weui-panel" ng-repeat="x in ptLoad.items">
+						<div class="weui-panel__hd">
+							<span ng-switch="x.tip">
+								<span class="c_org fr" ng-switch-when="正常">{{x.tip}}</span>
+								<span class="c_red fr" ng-switch-when="故障">{{x.tip}}</span>
+							</span>
+							{{x.MacName}}
+						</div>
+						<div class="weui-panel__bd">
+							<div class="panelList c_333 tac">
+								 <ul>
+									<li class="ptstock" ng-repeat="stock in x.stock">
+										<span>{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="weui-panel__ft">
+							<div class="weui-cell weui-cell_link fs14 c_999">						
+								<div class="weui-cell__bd">今日销售： <span class="c_333">{{x.today_sale.Q}}杯 &yen;{{x.today_sale.M}}</span></div>	
+								<div class="weui-cell__ft">七日销售： <span class="c_333">{{x.seven_sale.Q}}杯 &yen;{{x.seven_sale.M}}</span></div>
+							</div>
+						</div>
+					</a>					 
+				</div>
+			</div>
+			 <!--搜索内容start-->
+			<div class="weui-tab__panel" ng-if="!searDetail">
+				<div ng-if="focusIndex==1">
+					<a href="#!/pointDetail/id={{all.ID}}" class="weui-panel" ng-repeat="all in point_all">
+						<div class="weui-panel__hd">
+							<span ng-switch="all.tip">
+								<span class="c_org fr" ng-switch-when="正常">{{all.tip}}</span>
+								<span class="c_red fr" ng-switch-when="故障">{{all.tip}}</span>
+							</span>
+							{{all.MacName}}
+						</div>
+						<div class="weui-panel__bd">
+							<div class="panelList c_333 tac">
+								 <ul>
+									<li class="ptstock" ng-repeat="stock in all.stock">
+										<span>{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="weui-panel__ft">
+							<div class="weui-cell weui-cell_link fs14 c_999">						
+								<div class="weui-cell__bd">今日销售： <span class="c_333">{{all.today_sale.Q}}杯 &yen;{{all.today_sale.M}}</span></div>	
+								<div class="weui-cell__ft">七日销售： <span class="c_333">{{all.seven_sale.Q}}杯 &yen;{{all.seven_sale.M}}</span></div>
+							</div>
+						</div>
+					</a>
+				</div>
+
+				<div ng-if="focusIndex==2">
+					<a href="#!/pointDetail/id={{normal.ID}}" ng-click="mtDetail()" class="weui-panel" ng-repeat="normal in point_normal">
+						<div class="weui-panel__hd">
+							<span class="c_org fr">正常</span>
+							{{normal.MacName}}
+						</div>
+						<div class="weui-panel__bd">
+							<div class="panelList c_333 tac">
+								 <ul>
+									<li class="ptstock" ng-repeat="stock in normal.stock">
+										<span>{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="weui-panel__ft">
+							<div class="weui-cell weui-cell_link fs14 c_999">						
+								<div class="weui-cell__bd">今日销售： <span class="c_333">{{normal.today_sale.Q}}杯 &yen;{{normal.today_sale.M}}</span></div>	
+								<div class="weui-cell__ft">七日销售： <span class="c_333">{{normal.seven_sale.Q}}杯 &yen;{{normal.seven_sale.M}}</span></div>
+							</div>
+						</div>
+					</a>		
+				</div>
+
+				<div ng-if="focusIndex==3">
+					<a href="#!/pointDetail/id={{fault.ID}}" ng-click="mtDetail()" class="weui-panel" ng-repeat="fault in point_fault">
+						<div class="weui-panel__hd">
+							<span class="c_red fr">故障</span>
+							{{fault.MacName}}
+						</div>
+						<div class="weui-panel__bd">
+							<div class="panelList c_333 tac">
+								 <ul>
+									<li class="ptstock" ng-repeat="stock in fault.stock">
+										<span>{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="weui-panel__ft">
+							<div class="weui-cell weui-cell_link fs14 c_999">						
+								<div class="weui-cell__bd">今日销售： <span class="c_333">{{fault.today_sale.Q}}杯 &yen;{{fault.today_sale.M}}</span></div>	
+								<div class="weui-cell__ft">七日销售： <span class="c_333">{{fault.seven_sale.Q}}杯 &yen;{{fault.seven_sale.M}}</span></div>
+							</div>
+						</div>
+					</a>		
+				</div>
+
+				<div  infinite-scroll='ptLoad.nextPage()' infinite-scroll-disabled='ptLoad.busy' infinite-scroll-distance='1'>				 
+					 <a href="#!/pointDetail/id={{x.ID}}" ng-click="mtDetail()" class="weui-panel" ng-repeat="x in ptLoad.items">
+						<div class="weui-panel__hd">
+							<span ng-switch="x.tip">
+								<span class="c_org fr" ng-switch-when="正常">{{x.tip}}</span>
+								<span class="c_red fr" ng-switch-when="故障">{{x.tip}}</span>
+							</span>
+							{{x.MacName}}
+						</div>
+						<div class="weui-panel__bd">
+							<div class="panelList c_333 tac">
+								 <ul>
+									<li class="ptstock" ng-repeat="stock in x.stock">
+										<span>{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+									</li>
+								</ul>
+							</div>
+						</div>
+						<div class="weui-panel__ft">
+							<div class="weui-cell weui-cell_link fs14 c_999">						
+								<div class="weui-cell__bd">今日销售： <span class="c_333">{{x.today_sale.Q}}杯 &yen;{{x.today_sale.M}}</span></div>	
+								<div class="weui-cell__ft">七日销售： <span class="c_333">{{x.seven_sale.Q}}杯 &yen;{{x.seven_sale.M}}</span></div>
+							</div>
+						</div>
+					</a>					 
+				</div>
+			</div>
+			  <!--搜索内容end-->
+		</div>
+	</div>
+	<span class="filterIcon" id="filterIcon" ng-click="toggle()"></span>
+	 <div id="dialogs">
+			<div class="js_dialog" id="filterDialog" ng-if="flag">
+				<div class="weui-mask"></div>
+				<div class="weui-dialog">
+					<div class="dialogFormList"> 
+						<form name="pointForm" method='post'>					
+							<ul class="mRow cfix">
+								<li class="fl" style="width:55%">
+									<label>省</label>
+									<select ng-model="$parent.currPro" ng-init="$parent.currPro=province[0]" ng-change="$parent.currCity=currPro.chirldren[0]" ng-options="x.Province for x in province">
+									</select>
+								</li>
+								<li class="fr tar" style="width:45%;padding-left:40px;">
+									<label style="width:35px">市</label>
+									<select ng-model="$parent.currCity" ng-init="$parent.currCity=currPro.chirldren[0]" ng-options="x.City for x in currPro.chirldren">
+									</select>
+								</li>
+							</ul>
+							<ul>
+								<li>
+									<label>维护员</label>
+									<input ng-model="$parent.mtStuff" name="mtStuff" class="txtInput" type="text" placeholder="输入名字"/>
+								</li>
+								<li>
+									<label>关键字</label>
+									<input ng-model="$parent.pointInfo" name="pointInfo" class="txtInput" type="text" placeholder="点位名称和编号"/>
+								</li>
+								<li>
+									<div class="button-sp-area">
+										<button class="weui-btn weui-btn_mini weui-btn_default" ng-click="toggle()">取消</button>
+										<button class="weui-btn weui-btn_mini weui-btn_primary ml10" ng-click="submit()">确定</button>
+									</div>
+								</li>
+							</ul>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+</div> 	
+
+ 
+ 
+ 

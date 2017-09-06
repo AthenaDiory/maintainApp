@@ -1,0 +1,53 @@
+<div class="container" ng-controller="reportErrorCtrl">
+	<div class="weui-cells weui-cells_form mt0">
+		<div class="weui-cell">
+			<div class="weui-cell__bd">
+				<p class="fs16 mb10">问题描述</p>
+				<textarea class="weui-textarea fs14 txta" ng-model="problemDesc" placeholder="请简要描述遇到的问题（至少三个字）" required rows="5"></textarea>
+			</div>
+		</div>
+		<div class="weui-cell">
+			<div class="weui-cell__bd">
+				<div class="weui-uploader">
+					<div class="weui-uploader__hd">
+						<p class="weui-uploader__title">上传三张照片</p>
+					</div>
+					<div class="weui-uploader__bd">
+						<div class="weui-uploader__input-box">
+							<input id="uploaderInput" class="weui-uploader__input" ng-model="inputImg" type="file" accept="image/*" capture="camera" multiple="multiple" onchange="angular.element(this).scope().img_upload(this.files)">
+							
+						</div>
+						<span ng-repeat="item in thumb" class="weui-uploader__files" id="uploaderFiles">
+							<img class="weui_uploader_img" ng-model="selectImg" ng-src={{item.imgSrc}}>
+							<span class="weui_uploader_del" ng-click="img_del($index)"></span>
+						</span>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="weui-cell weui-cell_select weui-cell_select-after">
+			<div class="weui-cell__hd">
+				<label for="" class="weui-label">问题类型</label>
+			</div>
+			<div class="weui-cell__bd">
+				<select class="weui-select" name="select2" ng-init="selectedName =problemTypes[0]" ng-model="selectedName" ng-options="error for error in problemTypes">			
+				</select>
+			</div>
+		</div>
+		<div class="weui-cell weui-cell_select weui-cell_select-after">
+			<div class="weui-cell__hd">
+				<label for="" class="weui-label">故障等级</label>
+			</div>
+			<div class="weui-cell__bd">
+				<select class="weui-select" name="select3" ng-init="priority =selPriority[0]" ng-model="priority" ng-options="pri for pri in selPriority">			
+				</select>
+			</div>
+		</div>
+	</div>
+
+	<div class="p20"><a class="weui-btn weui-btn_primary fs16" 
+	ng-click="submitError()">提 交</a></div>
+
+</div>
+  
+

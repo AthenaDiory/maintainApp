@@ -1,0 +1,58 @@
+
+<div class="container" ng-controller="homeCtrl">
+	<div class="weui-cells tac">	 
+	 	 <div id="lineChart"></div>
+	</div>
+
+	<div class="weui-cells tac">
+		<div class="weui-cell statList fs14 lh24">
+			<div class="weui-flex__item">
+				<a href="#!/maintainList" style="color:#666" ng-click="boldmaintain()">
+					维护
+					<p class="c_red">紧急：{{maintain.urge}}</p>
+					<p class="c_yellow">待处理：{{maintain.pending}}</p>
+				</a>
+			</div>
+			<div class="weui-flex__item">
+				报警
+				<p class="c_red">紧急：{{alarm.urge}}</p>
+				<p class="c_yellow">待处理：{{alarm.pending}}</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="weui-cells tac">
+		<div class="weui-cell statList fs12">
+			<div class="weui-flex__item"><p class="c_999 mb10">0杯</p>{{saleTotal.qty0}}台</div>
+			<div class="weui-flex__item"><p class="c_999 mb10">1-5杯</p>{{saleTotal.qty1}}台</div>
+			<div class="weui-flex__item"><p class="c_999 mb10">6-10杯</p>{{saleTotal.qty2}}台</div>
+			<div class="weui-flex__item"><p class="c_999 mb10">11-20杯</p>{{saleTotal.qty3}}台</div>
+			<div class="weui-flex__item"><p class="c_999 mb10">20杯以上</p>{{saleTotal.qty4}}台</div>
+			<div class="weui-flex__item"><p class="c_999 mb10">平均</p>{{saleTotal.cpusAve}}杯</div>
+			<div class="weui-flex__item"><p class="c_999 mb10">总数</p>{{saleTotal.macTotal}}台</div>
+		</div>
+	</div>
+
+	<div class="weui-cells tac">
+		<div class="weui-cell ptb0">
+			<table class="tbList fs12 c_666">
+				<tr>
+					<th>日期</th>
+					<th>机器</th>
+					<th>销售额</th>
+					<th>订单</th>
+					<th>均价</th>
+				</tr>
+				<tr ng-repeat="list in detaiList">
+					<td>{{list.Day+' '}} <span style="color:#999">{{list.week}}</span></td>
+					<td>{{list.MacNum}}</td>
+					<td>{{list.Amount}}</td>
+					<td>{{list.Rec}}</td>
+					<td>{{list.Amount/list.Rec | number:2}}</td>
+				</tr>
+			</table>
+		</div>
+	</div>
+</div>
+
+ 

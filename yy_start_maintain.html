@@ -1,0 +1,202 @@
+ <div ng-controller="startMaintainCtrl">
+	<div class="container">
+		<div class="weui-cells mt0 tac">
+			<div class="weui-cell">
+				<div class="weui-cell__bd c_666">{{MacName}}</div>
+			</div>
+			<div class="weui-cell">
+				<div class="weui-cell__bd c_999 lh24">
+					<span class="c_333" ng-if="StartTime!=null">正在维护······<br />
+					已用时：{{showHours+'时'+showMinutes+'分'+showSeconds+'秒'}}</span>
+					<p class="plrBtn mt10"><a class="weui-btn weui-btn_mini weui-btn_primary" ng-if="StartTime==null" ng-click="stmaintain()">开始维护</a></p>
+				</div>
+			</div>
+		</div>
+		<div class="weui-cells">
+			<table class="tbList2 fs14 c_666">
+				<tr>
+					<th>料盒</th>
+					<th>库存</th>
+					<th>预警</th>
+					<th>操作</th>
+				</tr>
+				<tr ng-repeat="metrial in stock">
+					<td>{{metrial.Materials}}</td>
+					<td>{{metrial.Stock}}{{metrial.Unit}}</td>
+					<td>{{metrial.Warning}}{{metrial.Unit}}</td>
+					<td><span class="editIcon" ng-click="operate(metrial)"></span></td>
+				</tr>
+			</table>
+		</div>
+
+		<div class="weui-cells fs14">
+			<div class="weui-cell c_666">
+				<div class="weui-cell__hd">
+					<div class="whLeft fs16">
+						<span class="warnIcon"></span>
+						<p>故障</p>
+					</div>
+				</div>
+				<div class="weui-cell__bd">
+					<div class="whCent">
+						<div ng-repeat="fault in fault" ng-switch="fault.Priority">
+							<span class="fault_error fr" ng-switch-when="1">
+								紧急
+							</span>
+							<span class="fault_common fr" ng-switch-when="2">
+								一般
+							</span>
+							<span class="falult_normal fr" ng-switch-when="3">
+								正常
+							</span>
+							{{fault.ErrorTime | dateFormatted}}
+							<span ng-switch="fault.Types">
+								<span ng-switch-when="1">
+									【报警】
+								</span>
+								<span ng-switch-when="2">
+									【客服】
+								</span>
+							</span> 
+							{{fault.ErrorDesc}}
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="weui-cell plrBtn">
+			<a ng-click="remoteRest()" class="weui-btn weui-btn_mini weui-btn_default">远程重启</a>
+			<a ng-click="remoteOpen()" class="weui-btn weui-btn_mini weui-btn_default">远程开门</a>
+			<a ng-click="mtfinish()" class="weui-btn weui-btn_mini weui-btn_default">完成维护</a>
+		</div>
+		<div class="weui-cell plrBtn">
+			<a ng-click="reLock()" class="weui-btn weui-btn_mini weui-btn_default">重锁杯门</a>
+			<a ng-click="screenShot()" class="weui-btn weui-btn_mini weui-btn_default">截屏</a>
+			<a ng-click="cleanError()" class="weui-btn weui-btn_mini weui-btn_default">清除错误</a>
+		</div>
+	</div>
+
+	<div id="dialogs">
+		<div class="js_dialog" id="editDialog" ng-hide="flag">
+			<div class="weui-mask"></div>
+			<form action="" class="weui-dialog plr0 fs14">
+				<div class="weui-cells__title tac mt0">{{Materials}}</div>
+				<div class="weui-cell">
+					<div class="weui-cell__hd">
+						<label class="weui-label">添加</label>
+					</div>
+					<div class="weui-cell__bd">
+						<input class="weui-input" ng-model="addMt" id="addMt" type="number" placeholder="本次添加容量" ng-change="addSt()">
+					</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__hd">
+						<label class="weui-label">库存</label>
+					</div>
+					<div class="weui-cell__bd">
+						<input class="weui-input" ng-model="Stock" id="stock" type="text" disabled="disabled">
+					</div>
+				</div>
+				<div class="weui-cell">
+					<div class="weui-cell__hd">
+						<label class="weui-label">调整库存</label>
+					</div>
+					<div>
+						{{adjustCon}}
+					</div>
+				</div>
+				<div class="weui-cell button-sp-area">
+					<button class="weui-btn weui-btn_mini weui-btn_default" ng-click="operate()">取消</button>
+					<button class="weui-btn weui-btn_mini weui-btn_primary ml10" ng-click="submit()">确定</button>
+				</div>				
+			</form>
+		</div>
+	</div>
+	<div id="dialogs">
+		<div class="js_dialog" id="door" ng-show="remoRest">
+			<div class="weui-mask"></div>
+			<div class="weui-dialog p20">
+				<h3 class="fs16">远程重启</h3>
+				<div class="pswCell">
+					<span></span>
+					<input class="txtpsw" type="number" id="rstInput" ng-model="respsw" placeholder="输入密码" />
+				</div>
+				<div class="button-sp-area">
+					<button class="weui-btn weui-btn_mini weui-btn_default" ng-click="remoteRest()">取消</button>
+					<button class="weui-btn weui-btn_mini weui-btn_primary ml10" ng-click="remoteResSub()">确定</button>
+				</div>
+				
+			</div>
+		</div>
+		<div class="js_dialog" id="door" ng-show="remoOpen">
+			<div class="weui-mask"></div>
+			<div class="weui-dialog p20">
+				<h3 class="fs16">远程开门</h3>
+				<div class="pswCell">
+					<span></span>
+					<input class="txtpsw" type="number" id="opdInput" ng-model="txtpsw" placeholder="输入密码" />
+				</div>
+				<div class="button-sp-area">
+					<button class="weui-btn weui-btn_mini weui-btn_default" ng-click="remoteOpen()">取消</button>
+					<button class="weui-btn weui-btn_mini weui-btn_primary ml10" ng-click="remoteOpenSub()">确定</button>
+				</div>			
+			</div>
+		</div>
+		<div class="js_dialog" id="door" ng-show="mtSel">
+			<div class="weui-mask"></div>
+			<div class="weui-dialog p20" style="text-align:left"> 
+				<div class="weui-cell__bd" style="padding:10px 20px;font-size:14px;">
+					<div ng-repeat="fault in fault" ng-switch="fault.Priority">
+						<input type="checkbox" ng-model="mtcheck" ng-click="isChecked($event,fault.ID)" class="fl" style="margin-top:4px;">
+						<span class="fault_error fr" ng-switch-when="1">
+							紧急
+						</span>
+						<span class="fault_common fr" ng-switch-when="2">
+							一般
+						</span>
+						<span class="falult_normal fr" ng-switch-when="3">
+							正常
+						</span>
+						<span style="padding-left:5px;">{{fault.ErrorTime | dateFormatted}}</span>
+						<span ng-switch="fault.Types">
+							<span ng-switch-when="1">
+								【报警】
+							</span>
+							<span ng-switch-when="2">
+								【客服】
+							</span>
+						</span> 
+						{{fault.ErrorDesc}}
+					</div>			 
+				</div> 
+				<div class="button-sp-area smbtn">
+					<button class="weui-btn smbtn_cancel weui-btn_mini weui-btn_default" ng-click="mtfinish()">取消</button>
+					<button class="weui-btn weui-btn_mini weui-btn_primary ml10" ng-click="mtfinishSub()">完成维护</button>
+				</div>			
+			</div>
+		</div>
+		<div class="js_dialog" id="door" ng-show="relock">
+			<div class="weui-mask"></div>
+			<div class="weui-dialog p20">
+				<h3 class="fs16">重锁杯门</h3>
+				<div class="pswCell">
+					<span></span>
+					<input class="txtpsw" type="number" id="reloInput" ng-model="relopsw" placeholder="输入密码" />
+				</div>
+				<div class="button-sp-area">
+					<button class="weui-btn weui-btn_mini weui-btn_default" ng-click="reLock()">取消</button>
+					<button class="weui-btn weui-btn_mini weui-btn_primary ml10" ng-click="reLockSub()">确定</button>
+				</div>			
+			</div>
+		</div>
+		<div class="js_dialog" id="door" ng-show="scshot">
+			<div class="weui-mask" ng-click="scshot=!scshot"></div>
+			<div class="weui-dialog p20">
+				<img src="{{resUrl}}">		
+			</div>
+		</div>
+	</div>
+</div>
+ 
+ 

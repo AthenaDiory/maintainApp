@@ -1,0 +1,1024 @@
+<div ng-controller="maintainListCtrl">
+	<div class="container">
+		<div class="weui-tab">
+			<div class="weui-navbar">
+				<div class="weui-navbar__item" ng-click="navSwitch(1)" ng-class="{'weui-bar__item_on': focusIndex==1}">全部</div>
+				<div class="weui-navbar__item" ng-click="navSwitch(2)" ng-class="{'weui-bar__item_on': focusIndex==2}">紧急</div>
+				<div class="weui-navbar__item" ng-click="navSwitch(3)" ng-class="{'weui-bar__item_on': focusIndex==3}">待处理<span ng-if="maintain_pending_count!=0" class="weui-badge">{{maintain_pending_count}}</span></div>
+			</div>
+			<div class="weui-tab__panel" ng-if="searDetail">
+				<div ng-if="focusIndex==1">
+					<div ng-repeat="x in maintain_all | orderBy: 'Stat'">
+						<div class="weui-cells fs14" ng-if="x.Stat == 2">
+							<div class="weui-cell">
+								<div class="weui-cell__bd">
+									{{x.MacName}}
+								</div>
+								<div class="weui-cell__ft c_green">完成</div>
+							</div>
+							<div class="weui-cell lh24 whFlow">
+								<div class="weui-cell__bd c_org">
+									<span class="warnIcon"></span> 机器故障
+									<p>{{x.CreateTime}}</p>
+								</div>
+								<div class="weui-cell__ft c_org">
+									<span class="warnIcon"></span> 解决故障
+									<p>{{x.FinishTime}}</p>
+								</div>
+							</div>
+							<div class="weui-cell">
+								<div class="weui-cell__bd c_999 lh24">
+									<p><span class="c_666 fr">{{x.Number}}</span>故障单号</p>
+									<p><span class="c_666 fr">{{x.ErrorDesc}}</span>故障原因</p>
+									<p><span class="c_666 fr">{{x.MaintainName}}</span>维护员</p>
+								</div>
+							</div>
+							<div class="weui-cell">
+								<a href="#!/maintainSheet/MacNo={{x.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建维护</a>
+							</div>
+						</div>
+						<div class="weui-cells fs14" ng-if="x.Stat == 1 || x.Stat == 0">
+							<div class="weui-cell">
+								<div class="weui-cell__bd">
+									{{x.MacName}}
+								</div>
+								<div ng-switch="x.Priority">
+									<span class="fault_error fr" ng-switch-when="1">
+										紧急
+									</span>
+									<span class="fault_common fr" ng-switch-when="2">
+										一般
+									</span>
+									<span class="falult_normal fr" ng-switch-when="3">
+										延迟
+									</span>
+								</div>
+							</div>
+							<div class="weui-cell c_666">
+								<div class="weui-cell__hd">
+									<div class="whLeft fs16">
+										<span class="warnIcon"></span>
+										<p>故障</p>
+									</div>
+								</div>
+								<div class="weui-cell__bd">
+									<div class="whCent">
+										<div ng-repeat="y in x.fault" ng-switch="y.Priority">
+											<span class="fault_error fr" ng-switch-when="1">
+												严重
+											</span>
+											<span class="fault_common fr" ng-switch-when="2">
+												一般
+											</span>
+											<span class="falult_normal fr" ng-switch-when="3">
+												正常
+											</span>
+											{{y.ErrorTime | dateFormatted}}
+											<span ng-switch="y.Types">
+												<span ng-switch-when="1">
+													【报警】
+												</span>
+												<span ng-switch-when="2">
+													【客服】
+												</span>
+											</span> 
+											{{y.ErrorDesc}}
+										</div>
+									</div>
+								</div>
+							</div>
+
+						<div class="weui-cell tac plrBtn">						
+							<a href="#!/reportError/macNo={{x.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建故障单</a>
+						</div>
+
+							<div class="weui-cell c_666">
+								<div class="weui-cell__hd">
+									<div class="whLeft fs16">
+										料盒
+									</div>
+								</div>
+								<div class="weui-cell__bd">
+									<div class="whCent cfix fs12 lh24">
+										<ul>
+											<li ng-repeat="stock in x.stock" class="mtstock">
+												<span class="c_999">{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+
+							<div class="weui-cell">
+								<div class="weui-cell__bd lh24">
+									<p>
+										<span class="fr" ng-if="x.Times!=0"><span class="c_999">催单：</span>{{x.Times}}次 {{x.ReminderTime}}</span>
+										<span class="c_999">优先级：</span>
+										<span ng-switch="x.Priority">
+												<span ng-switch-when="1">
+													紧急
+												</span>
+												<span ng-switch-when="2">
+													一般
+												</span>
+												<span ng-switch-when="3">
+													正常
+												</span>
+										</span> 
+									</p>
+									<p>
+										<span class="fr"><span class="c_999">要求时间： </span>{{x.CreateTime}}</span>
+										<span class="c_999">维护员：</span>{{x.MaintainName}}
+									</p>
+									
+								</div>
+							</div>
+							<div class="weui-cell tac plrBtn">				
+								<a class="weui-btn weui-btn_mini weui-btn_default" ng-click="cancelOrder(x.ID)">撤单</a>
+								<a ng-click="remindOrder(x.ID,x.MacNo,x.MacName,x.Desc,x.MacName)" class="weui-btn weui-btn_mini weui-btn_default">催单</a>
+								<a href="#!/maintainDetail/id={{x.ID}}" class="weui-btn weui-btn_mini weui-btn_default">维护详情</a>
+								<a href="#!/startMaintain/id={{x.ID}}" class="weui-btn weui-btn_mini weui-btn_default">开始维护</a>						
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div ng-if="focusIndex==2">
+					<div class="weui-cells fs14" ng-repeat="urge in maintain_urgent">
+						<div class="weui-cell">
+							<div class="weui-cell__bd">
+								{{urge.MacName}}
+							</div>
+							<div ng-switch="urge.Priority">
+								<span class="fault_error fr" ng-switch-when="1">
+									紧急
+								</span>
+								<span class="fault_common fr" ng-switch-when="2">
+									一般
+								</span>
+								<span class="falult_normal fr" ng-switch-when="3">
+									延迟
+								</span>
+							</div>
+						</div>
+						<div class="weui-cell c_666">
+							<div class="weui-cell__hd">
+								<div class="whLeft fs16">
+									<span class="warnIcon"></span>
+									<p>故障</p>
+								</div>
+							</div>
+							<div class="weui-cell__bd">
+								<div class="whCent">
+									<div ng-repeat="y in urge.fault" ng-switch="y.Priority">
+										<span class="fault_error fr" ng-switch-when="1">
+												严重
+										</span>
+										<span class="fault_common fr" ng-switch-when="2">
+											一般
+										</span>
+										<span class="falult_normal fr" ng-switch-when="3">
+											正常
+										</span>
+										{{y.ErrorTime | dateFormatted}}
+										<span ng-switch="y.Types">
+											<span ng-switch-when="1">
+												【报警】
+											</span>
+											<span ng-switch-when="2">
+												【客服】
+											</span>
+										</span> 
+										{{y.ErrorDesc}}
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="weui-cell tac plrBtn">						
+							<a href="#!/reportError/macNo={{urge.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建故障单</a>
+						</div>
+
+						<div class="weui-cell c_666">
+							<div class="weui-cell__hd">
+								<div class="whLeft fs16">
+									料盒
+								</div>
+							</div>
+							<div class="weui-cell__bd">
+								<div class="whCent cfix fs12 lh24">
+									<ul>
+										<li ng-repeat="stock in urge.stock" class="mtstock">
+											<span class="c_999">{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<div class="weui-cell">
+							<div class="weui-cell__bd lh24">
+								<p>
+									<span class="fr" ng-if="urge.Times!=0"><span class="c_999">催单：</span>{{urge.Times}}次 {{urge.ReminderTime}}</span>
+									<span class="c_999">优先级：</span>
+									<span ng-switch="urge.Priority">
+											<span ng-switch-when="1">
+												紧急
+											</span>
+											<span ng-switch-when="2">
+												一般
+											</span>
+											<span ng-switch-when="3">
+												正常
+											</span>
+									</span> 
+								</p>
+								<p>
+									<span class="fr"><span class="c_999">要求时间： </span>{{urge.CreateTime}}</span>
+									<span class="c_999">维护员：</span>{{urge.MaintainName}}
+								</p>
+								
+							</div>
+						</div>
+
+						<div class="weui-cell tac plrBtn">						
+							<a ng-click="cancelOrder(urge.ID)" class="weui-btn weui-btn_mini weui-btn_default">撤单</a>
+							<a ng-click="remindOrder(urge.ID,urge.MacNo,urge.MacName,urge.Desc,urge.MacName)" class="weui-btn weui-btn_mini weui-btn_default">催单</a>
+							<a href="#!/maintainDetail/id={{urge.ID}}" class="weui-btn weui-btn_mini weui-btn_default">维护详情</a>
+							<a href="#!/startMaintain/id={{urge.ID}}" class="weui-btn weui-btn_mini weui-btn_default">开始维护</a>						
+						</div>
+					</div>			
+				</div>
+
+				<div ng-if="focusIndex==3">
+					<div class="weui-cells fs14" ng-repeat="pending in maintain_pending">
+						<div class="weui-cell">
+							<div class="weui-cell__bd">
+								{{pending.MacName}}
+							</div>
+							<div ng-switch="pending.Priority">
+								<span class="fault_error fr" ng-switch-when="1">
+									紧急
+								</span>
+								<span class="fault_common fr" ng-switch-when="2">
+									一般
+								</span>
+								<span class="falult_normal fr" ng-switch-when="3">
+									延迟
+								</span>
+							</div>
+						</div>
+						<div class="weui-cell c_666">
+							<div class="weui-cell__hd">
+								<div class="whLeft fs16">
+									<span class="warnIcon"></span>
+									<p>故障</p>
+								</div>
+							</div>
+							<div class="weui-cell__bd">
+								<div class="whCent">
+									<div ng-repeat="y in pending.fault" ng-switch="y.Priority">
+										<span class="fault_error fr" ng-switch-when="1">
+											严重
+										</span>
+										<span class="fault_common fr" ng-switch-when="2">
+											一般
+										</span>
+										<span class="falult_normal fr" ng-switch-when="3">
+											正常
+										</span>
+										{{y.ErrorTime | dateFormatted}}
+										<span ng-switch="y.Types">
+											<span ng-switch-when="1">
+												【报警】
+											</span>
+											<span ng-switch-when="2">
+												【客服】
+											</span>
+										</span> 
+										{{y.ErrorDesc}}
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="weui-cell tac plrBtn">						
+							<a href="#!/reportError/macNo={{pending.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建故障单</a>
+						</div>
+
+						<div class="weui-cell c_666">
+							<div class="weui-cell__hd">
+								<div class="whLeft fs16">
+									料盒
+								</div>
+							</div>
+							<div class="weui-cell__bd">
+								<div class="whCent cfix fs12 lh24">
+									<ul>
+										<li ng-repeat="stock in pending.stock" class="mtstock">
+											<span class="c_999">{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<div class="weui-cell">
+							<div class="weui-cell__bd lh24">
+								<p>
+									<span class="fr" ng-if="pending.Times!=0"><span class="c_999">催单：</span>{{pending.Times}}次 {{pending.ReminderTime}}</span>
+									<span class="c_999">优先级：</span>
+									<span ng-switch="pending.Priority">
+											<span ng-switch-when="1">
+												紧急
+											</span>
+											<span ng-switch-when="2">
+												一般
+											</span>
+											<span ng-switch-when="3">
+												正常
+											</span>
+									</span> 
+								</p>
+								<p>
+									<span class="fr"><span class="c_999">要求时间： </span>{{pending.CreateTime}}</span>
+									<span class="c_999">维护员：</span>{{pending.MaintainName}}
+								</p>
+								
+							</div>
+						</div>
+
+						<div class="weui-cell tac plrBtn">						
+							<a ng-click="cancelOrder(pending.ID)" class="weui-btn weui-btn_mini weui-btn_default">撤单</a>
+							<a ng-click="remindOrder(pending.ID,pending.MacNo,pending.MacName,pending.Desc,pending.MacName)"class="weui-btn weui-btn_mini weui-btn_default">催单</a>
+							<a href="#!/maintainDetail/id={{pending.ID}}" class="weui-btn weui-btn_mini weui-btn_default">维护详情</a>
+							<a href="#!/startMaintain/id={{pending.ID}}" class="weui-btn weui-btn_mini weui-btn_default">开始维护</a>						
+						</div>
+					</div>			
+				</div>
+
+				<div  infinite-scroll='reddit.nextPage()' infinite-scroll-disabled='reddit.busy' infinite-scroll-distance='1'>	
+						<div ng-repeat="x in reddit.items">
+							<div class="weui-cells fs14" ng-if="x.Stat == 2">
+								<div class="weui-cell">
+									<div class="weui-cell__bd">
+										{{x.MacName}}
+									</div>
+									<div class="weui-cell__ft c_green">完成</div>
+								</div>
+								<div class="weui-cell lh24 whFlow">
+									<div class="weui-cell__bd c_org">
+										<span class="warnIcon"></span> 机器故障
+										<p>{{x.CreateTime}}</p>
+									</div>
+									<div class="weui-cell__ft c_org">
+										<span class="warnIcon"></span> 解决故障
+										<p>{{x.FinishTime}}</p>
+									</div>
+								</div>
+								<div class="weui-cell">
+									<div class="weui-cell__bd c_999 lh24">
+										<p><span class="c_666 fr">{{x.Number}}</span>故障单号</p>
+										<p><span class="c_666 fr">{{x.Desc}}</span>故障原因</p>
+										<p><span class="c_666 fr">{{x.MaintainName}}</span>维护员</p>
+									</div>
+								</div>
+								<div class="weui-cell">
+										<a href="#!/maintainSheet/MacNo={{x.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建维护</a>
+								</div>
+							</div>
+							<div class="weui-cells fs14" ng-if="x.Stat == 1 || x.Stat == 0">
+								<div class="weui-cell">
+									<div class="weui-cell__bd">
+										{{x.MacName}}
+									</div>
+									<div ng-switch="x.Priority">
+										<span class="fault_error fr" ng-switch-when="1">
+											紧急
+										</span>
+										<span class="fault_common fr" ng-switch-when="2">
+											一般
+										</span>
+										<span class="falult_normal fr" ng-switch-when="3">
+											延迟
+										</span>
+									</div>
+								</div>
+								<div class="weui-cell c_666">
+									<div class="weui-cell__hd">
+										<div class="whLeft fs16">
+											<span class="warnIcon"></span>
+											<p>故障</p>
+										</div>
+									</div>
+									<div class="weui-cell__bd">
+										<div class="whCent">
+											<div ng-repeat="y in x.fault" ng-switch="y.Priority">
+												<span class="fault_error fr" ng-switch-when="1">
+													严重
+												</span>
+												<span class="fault_common fr" ng-switch-when="2">
+													一般
+												</span>
+												<span class="falult_normal fr" ng-switch-when="3">
+													正常
+												</span>
+												{{y.ErrorTime | dateFormatted}}
+												<span ng-switch="y.Types">
+													<span ng-switch-when="1">
+														【报警】
+													</span>
+													<span ng-switch-when="2">
+														【客服】
+													</span>
+												</span> 
+												{{y.ErrorDesc}}
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="weui-cell tac plrBtn">						
+									<a href="#!/reportError/macNo={{x.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建故障单</a>
+								</div>
+								<div class="weui-cell c_666">
+									<div class="weui-cell__hd">
+										<div class="whLeft fs16">
+											料盒
+										</div>
+									</div>
+									<div class="weui-cell__bd">
+										<div class="whCent cfix fs12 lh24">
+											<ul>
+												<li ng-repeat="stock in x.stock" class="mtstock">
+													<span class="c_999">{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+
+								<div class="weui-cell">
+									<div class="weui-cell__bd lh24">
+										<p>
+											<span class="fr" ng-if="x.Times!=0"><span class="c_999" >催单：</span>{{x.Times}}次 {{x.ReminderTime}}</span>
+											<span class="c_999">优先级：</span>
+											<span ng-switch="x.Priority">
+													<span ng-switch-when="1">
+														紧急
+													</span>
+													<span ng-switch-when="2">
+														一般
+													</span>
+													<span ng-switch-when="3">
+														正常
+													</span>
+											</span> 
+										</p>
+										<p>
+											<span class="fr"><span class="c_999">要求时间： </span>{{x.CreateTime}}</span>
+											<span class="c_999">维护员：</span>{{x.MaintainName}}
+										</p>
+										
+									</div>
+								</div>
+								<div class="weui-cell tac plrBtn">				
+									<a class="weui-btn weui-btn_mini weui-btn_default"  ng-click="cancelOrder(x.ID)">撤单</a>
+									<a ng-click="remindOrder(x.ID,x.MacNo,x.MacName,x.Desc,x.MacName)" class="weui-btn weui-btn_mini weui-btn_default">催单</a>
+									<a href="#!/maintainDetail/id={{x.ID}}" class="weui-btn weui-btn_mini weui-btn_default">维护详情</a>
+									<a href="#!/startMaintain/id={{x.ID}}" class="weui-btn weui-btn_mini weui-btn_default">开始维护</a>						
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+			 <!--搜索内容start-->
+			<div class="weui-tab__panel" ng-if="!searDetail">
+				<div ng-if="focusIndex==1">
+					<div ng-repeat="x in maintain_all">
+						<div class="weui-cells fs14" ng-if="x.Stat == 2">
+							<div class="weui-cell">
+								<div class="weui-cell__bd">
+									{{x.MacName}}
+								</div>
+								<div class="weui-cell__ft c_green">完成</div>
+							</div>
+							<div class="weui-cell lh24 whFlow">
+								<div class="weui-cell__bd c_org">
+									<span class="warnIcon"></span> 机器故障
+									<p>{{x.CreateTime}}</p>
+								</div>
+								<div class="weui-cell__ft c_org">
+									<span class="warnIcon"></span> 解决故障
+									<p>{{x.FinishTime}}</p>
+								</div>
+							</div>
+							<div class="weui-cell">
+								<div class="weui-cell__bd c_999 lh24">
+									<p><span class="c_666 fr">{{x.Number}}</span>故障单号</p>
+									<p><span class="c_666 fr">{{x.Desc}}</span>故障原因</p>
+									<p><span class="c_666 fr">{{x.MaintainName}}</span>维护员</p>
+								</div>
+							</div>
+							<div class="weui-cell">
+								<a href="#!/maintainSheet/MacNo={{x.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建维护</a>
+							</div>
+						</div>
+						<div class="weui-cells fs14" ng-if="x.Stat == 1 || x.Stat == 0">
+							<div class="weui-cell">
+								<div class="weui-cell__bd">
+									{{x.MacName}}
+								</div>
+								<div ng-switch="x.Priority">
+									<span class="fault_error fr" ng-switch-when="1">
+										紧急
+									</span>
+									<span class="fault_common fr" ng-switch-when="2">
+										一般
+									</span>
+									<span class="falult_normal fr" ng-switch-when="3">
+										延迟
+									</span>
+								</div>
+							</div>
+							<div class="weui-cell c_666">
+								<div class="weui-cell__hd">
+									<div class="whLeft fs16">
+										<span class="warnIcon"></span>
+										<p>故障</p>
+									</div>
+								</div>
+								<div class="weui-cell__bd">
+									<div class="whCent">
+										<div ng-repeat="y in x.fault" ng-switch="y.Priority">
+											<span class="fault_error fr" ng-switch-when="1">
+												严重
+											</span>
+											<span class="fault_common fr" ng-switch-when="2">
+												一般
+											</span>
+											<span class="falult_normal fr" ng-switch-when="3">
+												正常
+											</span>
+											{{y.ErrorTime | dateFormatted}}
+											<span ng-switch="y.Types">
+												<span ng-switch-when="1">
+													【报警】
+												</span>
+												<span ng-switch-when="2">
+													【客服】
+												</span>
+											</span> 
+											{{y.ErrorDesc}}
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="weui-cell tac plrBtn">						
+								<a href="#!/reportError/macNo={{x.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建故障单</a>
+							</div>
+
+							<div class="weui-cell c_666">
+								<div class="weui-cell__hd">
+									<div class="whLeft fs16">
+										料盒
+									</div>
+								</div>
+								<div class="weui-cell__bd">
+									<div class="whCent cfix fs12 lh24">
+										<ul>
+											<li ng-repeat="stock in x.stock" class="mtstock">
+												<span class="c_999">{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+											</li>
+										</ul>
+									</div>
+								</div>
+							</div>
+
+							<div class="weui-cell">
+								<div class="weui-cell__bd lh24">
+									<p>
+										<span class="fr" ng-if="x.Times!=0"><span class="c_999" >催单：</span>{{x.Times}}次 {{x.ReminderTime}}</span>
+										<span class="c_999">优先级：</span>
+										<span ng-switch="x.Priority">
+												<span ng-switch-when="1">
+													紧急
+												</span>
+												<span ng-switch-when="2">
+													一般
+												</span>
+												<span ng-switch-when="3">
+													正常
+												</span>
+										</span> 
+									</p>
+									<p>
+										<span class="fr"><span class="c_999">要求时间： </span>{{x.CreateTime}}</span>
+										<span class="c_999">维护员：</span>{{x.MaintainName}}
+									</p>
+									
+								</div>
+							</div>
+							<div class="weui-cell tac plrBtn">						
+								<a ng-click="cancelOrder(x.ID)" class="weui-btn weui-btn_mini weui-btn_default">撤单</a>
+								<a ng-click="remindOrder(x.ID,x.MacNo,x.MacName,x.Desc,x.MacName)" class="weui-btn weui-btn_mini weui-btn_default">催单</a>
+								<a href="#!/maintainDetail/id={{x.ID}}" class="weui-btn weui-btn_mini weui-btn_default">维护详情</a>
+								<a href="#!/startMaintain/id={{x.ID}}" class="weui-btn weui-btn_mini weui-btn_default">开始维护</a>						
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div ng-if="focusIndex==2">
+					<div class="weui-cells fs14" ng-repeat="urge in maintain_urgent">
+						<div class="weui-cell">
+							<div class="weui-cell__bd">
+								{{urge.MacName}}
+							</div>
+							<div ng-switch="urge.Priority">
+									<span class="fault_error fr" ng-switch-when="1">
+										紧急
+									</span>
+									<span class="fault_common fr" ng-switch-when="2">
+										一般
+									</span>
+									<span class="falult_normal fr" ng-switch-when="3">
+										延迟
+									</span>
+							</div>
+						</div>
+						<div class="weui-cell c_666">
+							<div class="weui-cell__hd">
+								<div class="whLeft fs16">
+									<span class="warnIcon"></span>
+									<p>故障</p>
+								</div>
+							</div>
+							<div class="weui-cell__bd">
+								<div class="whCent">
+									<div ng-repeat="y in urge.fault" ng-switch="y.Priority">
+										<span class="fault_error fr" ng-switch-when="1">
+											严重
+										</span>
+										<span class="fault_common fr" ng-switch-when="2">
+											一般
+										</span>
+										<span class="falult_normal fr" ng-switch-when="3">
+											正常
+										</span>
+										{{y.ErrorTime | dateFormatted}}
+										<span ng-switch="y.Types">
+											<span ng-switch-when="1">
+												【报警】
+											</span>
+											<span ng-switch-when="2">
+												【客服】
+											</span>
+										</span> 
+										{{y.ErrorDesc}}
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="weui-cell tac plrBtn">						
+							<a href="#!/reportError/macNo={{urge.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建故障单</a>
+						</div>
+
+						<div class="weui-cell c_666">
+							<div class="weui-cell__hd">
+								<div class="whLeft fs16">
+									料盒
+								</div>
+							</div>
+							<div class="weui-cell__bd">
+								<div class="whCent cfix fs12 lh24">
+									<ul>
+										<li ng-repeat="stock in urge.stock" class="mtstock">
+											<span class="c_999">{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<div class="weui-cell">
+							<div class="weui-cell__bd lh24">
+								<p>
+									<span class="fr" ng-if="urge.Times!=0"><span class="c_999">催单：</span>{{urge.Times}}次 {{urge.ReminderTime}}</span>
+									<span class="c_999">优先级：</span>
+									<span ng-switch="urge.Priority">
+											<span ng-switch-when="1">
+												紧急
+											</span>
+											<span ng-switch-when="2">
+												一般
+											</span>
+											<span ng-switch-when="3">
+												正常
+											</span>
+									</span> 
+								</p>
+								<p>
+									<span class="fr"><span class="c_999">要求时间： </span>{{urge.CreateTime}}</span>
+									<span class="c_999">维护员：</span>{{urge.MaintainName}}
+								</p>
+								
+							</div>
+						</div>
+
+						<div class="weui-cell tac plrBtn">						
+							<a ng-click="cancelOrder(urge.ID)" class="weui-btn weui-btn_mini weui-btn_default">撤单</a>
+							<a ng-click="remindOrder(urge.ID,urge.MacNo,urge.MacName,urge.Desc,urge.MacName)" class="weui-btn weui-btn_mini weui-btn_default">催单</a>
+							<a href="#!/maintainDetail/id={{urge.ID}}" class="weui-btn weui-btn_mini weui-btn_default">维护详情</a>
+							<a href="#!/startMaintain/id={{urge.ID}}" class="weui-btn weui-btn_mini weui-btn_default">开始维护</a>						
+						</div>
+					</div>			
+				</div>
+
+				<div ng-if="focusIndex==3">
+					<div class="weui-cells fs14" ng-repeat="pending in maintain_pending">
+						<div class="weui-cell">
+							<div class="weui-cell__bd">
+								{{pending.MacName}}
+							</div>
+							<div ng-switch="pending.Priority">
+									<span class="fault_error fr" ng-switch-when="1">
+										紧急
+									</span>
+									<span class="fault_common fr" ng-switch-when="2">
+										一般
+									</span>
+									<span class="falult_normal fr" ng-switch-when="3">
+										延迟
+									</span>
+								</div>
+						</div>
+						<div class="weui-cell c_666">
+							<div class="weui-cell__hd">
+								<div class="whLeft fs16">
+									<span class="warnIcon"></span>
+									<p>故障</p>
+								</div>
+							</div>
+							<div class="weui-cell__bd">
+								<div class="whCent">
+									<div ng-repeat="y in pending.fault" ng-switch="y.Priority">
+										<span class="fault_error fr" ng-switch-when="1">
+											严重
+										</span>
+										<span class="fault_common fr" ng-switch-when="2">
+											一般
+										</span>
+										<span class="falult_normal fr" ng-switch-when="3">
+											正常
+										</span>
+										{{y.ErrorTime | dateFormatted}}
+										<span ng-switch="y.Types">
+											<span ng-switch-when="1">
+												【报警】
+											</span>
+											<span ng-switch-when="2">
+												【客服】
+											</span>
+										</span> 
+										{{y.ErrorDesc}}
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="weui-cell tac plrBtn">						
+							<a href="#!/reportError/macNo={{pending.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建故障单</a>
+						</div>
+						<div class="weui-cell c_666">
+							<div class="weui-cell__hd">
+								<div class="whLeft fs16">
+									料盒
+								</div>
+							</div>
+							<div class="weui-cell__bd">
+								<div class="whCent cfix fs12 lh24">
+									<ul>
+										<li ng-repeat="stock in pending.stock" class="mtstock">
+											<span class="c_999">{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+										</li>
+									</ul>
+								</div>
+							</div>
+						</div>
+
+						<div class="weui-cell">
+							<div class="weui-cell__bd lh24">
+								<p>
+									<span class="fr" ng-if="pending.Times!=0"><span class="c_999">催单：</span>{{pending.Times}}次 {{pending.ReminderTime}}</span>
+									<span class="c_999">优先级：</span>
+									<span ng-switch="pending.Priority">
+											<span ng-switch-when="1">
+												紧急
+											</span>
+											<span ng-switch-when="2">
+												一般
+											</span>
+											<span ng-switch-when="3">
+												正常
+											</span>
+									</span> 
+								</p>
+								<p>
+									<span class="fr"><span class="c_999">要求时间： </span>{{pending.CreateTime}}</span>
+									<span class="c_999">维护员：</span>{{pending.MaintainName}}
+								</p>
+								
+							</div>
+						</div>
+
+						<div class="weui-cell tac plrBtn">						
+							<a ng-click="cancelOrder(pending.ID)" class="weui-btn weui-btn_mini weui-btn_default">撤单</a>
+							<a ng-click="remindOrder(pending.ID,pending.MacNo,pending.MacName,pending.Desc,pending.MacName)" class="weui-btn weui-btn_mini weui-btn_default">催单</a>
+							<a href="#!/maintainDetail/id={{pending.ID}}" class="weui-btn weui-btn_mini weui-btn_default">维护详情</a>
+							<a href="#!/startMaintain/id={{pending.ID}}" class="weui-btn weui-btn_mini weui-btn_default">开始维护</a>						
+						</div>
+					</div>			
+				</div>
+
+				<div  infinite-scroll='reddit.nextPage()' infinite-scroll-disabled='reddit.busy' infinite-scroll-distance='1'>	
+						<div ng-repeat="x in reddit.items">
+							<div class="weui-cells fs14" ng-if="x.Stat == 2">
+								<div class="weui-cell">
+									<div class="weui-cell__bd">
+										{{x.MacName}}
+									</div>
+									<div class="weui-cell__ft c_green">完成</div>
+								</div>
+								<div class="weui-cell lh24 whFlow">
+									<div class="weui-cell__bd c_org">
+										<span class="warnIcon"></span> 机器故障
+										<p>{{x.CreateTime}}</p>
+									</div>
+									<div class="weui-cell__ft c_org">
+										<span class="warnIcon"></span> 解决故障
+										<p>{{x.FinishTime}}</p>
+									</div>
+								</div>
+								<div class="weui-cell">
+									<div class="weui-cell__bd c_999 lh24">
+										<p><span class="c_666 fr">{{x.Number}}</span>故障单号</p>
+										<p><span class="c_666 fr">{{x.Desc}}</span>故障原因</p>
+										<p><span class="c_666 fr">{{x.MaintainName}}</span>维护员</p>
+									</div>
+								</div>
+								<div class="weui-cell">
+										<a href="#!/maintainSheet/MacNo={{x.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建维护</a>
+								</div>
+							</div>
+							<div class="weui-cells fs14" ng-if="x.Stat == 1 || x.Stat == 0">
+								<div class="weui-cell">
+									<div class="weui-cell__bd">
+										{{x.MacName}}
+									</div>
+									<div ng-switch="x.Priority">
+										<span class="fault_error fr" ng-switch-when="1">
+											紧急
+										</span>
+										<span class="fault_common fr" ng-switch-when="2">
+											一般
+										</span>
+										<span class="falult_normal fr" ng-switch-when="3">
+											延迟
+										</span>
+									</div>
+								</div>
+								<div class="weui-cell c_666">
+									<div class="weui-cell__hd">
+										<div class="whLeft fs16">
+											<span class="warnIcon"></span>
+											<p>故障</p>
+										</div>
+									</div>
+									<div class="weui-cell__bd">
+										<div class="whCent">
+											<div ng-repeat="y in x.fault" ng-switch="y.Priority">
+												<span class="fault_error fr" ng-switch-when="1">
+													严重
+												</span>
+												<span class="fault_common fr" ng-switch-when="2">
+													一般
+												</span>
+												<span class="falult_normal fr" ng-switch-when="3">
+													正常
+												</span>
+												{{y.ErrorTime | dateFormatted}}
+												<span ng-switch="y.Types">
+													<span ng-switch-when="1">
+														【报警】
+													</span>
+													<span ng-switch-when="2">
+														【客服】
+													</span>
+												</span> 
+												{{y.ErrorDesc}}
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="weui-cell tac plrBtn">						
+									<a href="#!/reportError/macNo={{x.MacNo}}" class="weui-btn weui-btn_mini weui-btn_default">新建故障单</a>
+								</div>
+								<div class="weui-cell c_666">
+									<div class="weui-cell__hd">
+										<div class="whLeft fs16">
+											料盒
+										</div>
+									</div>
+									<div class="weui-cell__bd">
+										<div class="whCent cfix fs12 lh24">
+											<ul>
+												<li ng-repeat="stock in x.stock" class="mtstock">
+													<span class="c_999">{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+												</li>
+											</ul>
+										</div>
+									</div>
+								</div>
+
+								<div class="weui-cell">
+									<div class="weui-cell__bd lh24">
+										<p>
+											<span class="fr" ng-if="x.Times!=0"><span class="c_999" >催单：</span>{{x.Times}}次 {{x.ReminderTime}}</span>
+											<span class="c_999">优先级：</span>
+											<span ng-switch="x.Priority">
+													<span ng-switch-when="1">
+														紧急
+													</span>
+													<span ng-switch-when="2">
+														一般
+													</span>
+													<span ng-switch-when="3">
+														正常
+													</span>
+											</span> 
+										</p>
+										<p>
+											<span class="fr"><span class="c_999">要求时间： </span>{{x.CreateTime}}</span>
+											<span class="c_999">维护员：</span>{{x.MaintainName}}
+										</p>
+										
+									</div>
+								</div>
+								<div class="weui-cell tac plrBtn">				
+									<a class="weui-btn weui-btn_mini weui-btn_default" ng-click="cancelOrder(x.ID)">撤单</a>
+									<a ng-click="remindOrder(x.ID,x.MacNo,x.MacName,x.Desc,x.MacName)" class="weui-btn weui-btn_mini weui-btn_default">催单</a>
+									<a href="#!/maintainDetail/id={{x.ID}}" class="weui-btn weui-btn_mini weui-btn_default">维护详情</a>
+									<a href="#!/startMaintain/id={{x.ID}}" class="weui-btn weui-btn_mini weui-btn_default">开始维护</a>						
+								</div>
+							</div>
+						</div>
+				</div>
+			</div>
+			  <!--搜索内容end-->
+		</div>
+	</div>
+	<span class="filterIcon" id="filterIcon" ng-click="toggle()"></span>
+	 <div id="dialogs">
+			<div class="js_dialog" id="filterDialog" ng-if="flag">
+				<div class="weui-mask"></div>
+				<div class="weui-dialog">
+					<div class="dialogFormList"> 
+						<form name="pointForm" method='post'>					
+							<ul class="mRow cfix">
+								<li class="fl" style="width:55%">
+									<label>省</label>
+									<select ng-model="$parent.currPro" ng-init="$parent.currPro=province[0]" ng-change="$parent.currCity=currPro.chirldren[0]" ng-options="x.Province for x in province">
+									</select>
+								</li>
+								<li class="fr tar" style="width:45%;padding-left:40px;">
+									<label style="width:35px">市</label>
+									<select ng-model="$parent.currCity" ng-init="$parent.currCity=currPro.chirldren[0]" ng-options="x.City for x in currPro.chirldren">
+									</select>
+								</li>
+							</ul>
+							<ul>
+								<li>
+									<label>维护员</label>
+									<input ng-model="$parent.mtStuff" name="mtStuff" class="txtInput" type="text" placeholder="输入名字"/>
+								</li>
+								<li>
+									<label>关键字</label>
+									<input ng-model="$parent.pointInfo" name="pointInfo" class="txtInput" type="text" placeholder="点位名称和编号"/>
+								</li>
+								<li>
+									<div class="button-sp-area">
+										<button class="weui-btn weui-btn_mini weui-btn_default" ng-click="toggle()">取消</button>
+										<button class="weui-btn weui-btn_mini weui-btn_primary ml10" ng-click="submit()">确定</button>
+									</div>
+								</li>
+							</ul>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div> 
+</div> 	
+
+ 
+ 
+ 

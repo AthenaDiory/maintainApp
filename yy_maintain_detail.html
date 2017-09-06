@@ -1,0 +1,129 @@
+<div class="container" ng-controller="maintainDetailCtrl">
+	
+	<div class="weui-cells mt0">
+		<div class="weui-cell">
+			<div class="weui-cell__bd fs16 lh24">
+				机器编号：{{detailData.MacNo}}
+				<p class="fs14 c_999">{{detailData.MacName}}</p>
+			</div>
+		</div>
+	</div>
+
+	<div class="weui-panel">
+		<div class="weui-panel__hd fs16">料盒</div>
+		<div class="weui-panel__bd">
+			<div class="panelList c_333 tac">
+				<ul class="mtdStockBox">
+					<li ng-repeat="stock in detailData.stock" class="mtdStock">
+						<span class="c_999">{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="weui-cells fs14">
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				维护单号
+			</div>
+			<div class="weui-cell__ft c_666">
+				{{detailData.Number}}
+			</div>
+		</div>
+		 
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				故障原因
+			</div>
+			<div class="weui-cell__ft c_666">
+				{{detailData.ErrorDesc}}
+			</div>
+		</div>
+		<div class="weui-cell" >
+			<div class="weui-cell__bd c_999">
+				故障时间
+			</div>
+			<div class="weui-cell__ft c_666">
+				{{detailData.CreateTime}}
+			</div>
+		</div>
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				要求时间
+			</div>
+			<div class="weui-cell__ft c_666">
+				{{detailData.AskTime}}
+			</div>
+		</div>
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				催单
+			</div>
+			<div class="weui-cell__ft c_666">
+				{{detailData.ReminderTime}}
+			</div>
+		</div>
+	</div>
+
+	<div class="weui-cells fs14">
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				下单人
+			</div>
+			<div class="weui-cell__ft c_666">
+				{{detailData.CreateName}}
+			</div>
+		</div>
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				优先级
+			</div>
+			<div class="weui-cell__ft c_666" ng-switch="detailData.Priority">
+					<span ng-switch-when="1">
+						紧急
+					</span>
+					<span ng-switch-when="2">
+						一般
+					</span>
+					<span ng-switch-when="3">
+						正常
+					</span>
+									 
+			</div>
+		</div>
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				维护员
+			</div>
+			<div class="weui-cell__ft c_666">
+				{{detailData.MaintainName}}
+			</div>
+		</div>
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				业务员
+			</div>
+			<div class="weui-cell__ft c_666">
+				吴晶
+			</div>
+		</div>
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				<p style="width:60px;">地址</p>
+			</div>
+			<div class="weui-cell__ft c_666">
+				{{detailData.MacName}}
+			</div>
+		</div>
+	</div>
+
+	<div class="weui-cell plrBtn">
+		<a ng-click="cancelOrder()" class="weui-btn weui-btn_mini weui-btn_default">撤单</a>
+		<a ng-click="remindOrder()" class="weui-btn weui-btn_mini weui-btn_default">催单</a>
+		<a href="#!startMaintain/id={{currID}}" class="weui-btn weui-btn_mini weui-btn_default">开始维护</a>
+	</div>
+
+	
+</div>
+ 

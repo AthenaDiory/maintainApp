@@ -1,0 +1,25 @@
+
+<div class="bg" ng-controller="loginCtrl">
+  <div class="pt90">
+    <h1 class="logo"><img src="images/logo.png"></h1>
+    <div class="formCell mt20">
+      <form method="post" action="">
+      <ul>
+        <li>
+          <span class="mIco"></span>
+          <input class="int bs" id="idLogPhs" ng-model="idLogPhs" type="text" placeholder="登录帐号" />
+        </li>
+        <li>
+          <span class="vIco"></span>
+          <input type="password" class="int bs" id="idLogPwd" ng-model="idLogPwd"  value="" placeholder="登录密码"  maxlength="32"  >
+        </li>
+        <li class="mt50">
+          <input class="btn" ng-click="submit()" type="button" value="登 录" />
+        </li>
+      </ul>
+      </form>
+    </div>
+  </div>
+</div>
+
+

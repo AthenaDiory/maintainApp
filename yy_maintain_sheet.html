@@ -1,0 +1,36 @@
+<div class="container" ng-controller="maintainSheetCtrl">
+	<div class="weui-cells">
+		<div class="weui-cell weui-cell_select weui-cell_select-after">
+			<div class="weui-cell__hd">
+				<label for="" class="weui-label">要求时间</label>
+			</div>
+			<div class="weui-cell__bd">
+				<select class="weui-select c_999 fs14" name="select" ng-model="selDate" ng-init="selDate=dates[0]" ng-options="items for items in dates">
+				</select>
+			</div>
+		</div>
+	</div>
+
+	<div class="weui-cells">
+		<div class="weui-cell weui-cell_select weui-cell_select-after">
+			<div class="weui-cell__hd">
+				<label for="" class="weui-label">优先级</label>
+			</div>
+			<div class="weui-cell__bd">
+				<select class="weui-select c_999 fs14" name="select" ng-model="selePri" ng-options="item for item in options" ng-init="selePri=options[0]">
+				</select>
+			</div>
+		</div>
+	</div>
+
+	<div class="weui-cells weui-cells_form">
+		<div class="weui-cell">
+			<div class="weui-cell__bd">
+				<textarea class="weui-textarea fs14" placeholder="请简要描述遇到的问题（至少三个字）" rows="5" ng-model="ErrorDesc"></textarea>
+			</div>
+		</div>
+	</div>
+
+	<div class="p20"><a ng-click="submit()" class="weui-btn weui-btn_primary fs16">提 交</a></div>
+
+</div>

@@ -1,0 +1,143 @@
+<div class="container" ng-controller="pointDetailCtrl">
+	<div class="weui-cells mt0">
+		<div class="weui-cell fs14">
+			{{MacName}}
+		</div>
+	</div>
+
+	<div class="weui-panel">
+		<div class="weui-panel__hd fs16">料盒</div>
+		<div class="weui-panel__bd">
+			<div class="panelList c_333 tac">
+				<ul>
+					<li ng-repeat="stock in stock" class="ptdstock">
+						<span class="c_999">{{stock.Materials}}：</span>{{stock.Stock}}{{stock.Unit}}
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+
+	<div class="weui-cells fs14">
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				今日销售
+			</div>
+			<div class="weui-cell__ft c_333">
+				{{today_sale.Q}}杯 &yen;{{today_sale.M}} {{tsPrice | number:0}}元／单
+			</div>
+		</div>
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				七日销售
+			</div>
+			<div class="weui-cell__ft c_333">
+				{{seven_sale.Q}}杯 &yen;{{seven_sale.M}} {{ssPrice| number:0}}元／单
+			</div>
+		</div>
+		<div class="weui-cell">
+			<div class="weui-cell__bd c_999">
+				本月销售
+			</div>
+			<div class="weui-cell__ft c_333">
+				 {{month_sale.Q}}杯 &yen;{{month_sale.M}} {{msPrice | number:0}}元／单
+			</div>
+		</div>
+	</div>
+
+	<div class="weui-panel fs14">
+		<div class="weui-panel__hd">
+			<p class="c_999">	
+				<span class="c_333 fr">{{LastOrderTime}}</span>
+				最后销售时间
+			</p>
+			<p class="c_999">
+				<span class="c_333 fr">{{LastTouchTime}}</span>
+				最后通讯时间
+			</p>
+		</div>
+		<div class="weui-panel__bd">
+			<p class="c_999">	
+				<span class="c_666 fr">{{OptName}}</span>
+				维护员
+			</p>
+			<p class="c_999">	
+				<span class="c_666 fr">{{UserName}}</span>
+				业务员
+			</p>
+			<p class="c_999">	
+				<span class="c_666 fr">今日1次 本月1次</span>
+				投诉次数
+			</p>
+			<p class="c_999">	
+				<span class="c_666 fr">{{Area}}</span>
+				地址
+			</p>
+		</div>
+		<div class="weui-panel__ft">
+			<div class="weui-cell weui-cell_link">
+				<a href="#!/startMaintain/id={{job.ID}}" ng-show="job" class="weui-btn weui-btn_mini weui-btn_default">开始维护</a>
+				<a href="#!/maintainSheet/MacNo={{MacNo}}" ng-show="!job" class="weui-btn weui-btn_mini weui-btn_default">新建维护单</a>
+				<a ng-click="pdtRest()" class="weui-btn weui-btn_mini weui-btn_default">远程重启</a>
+				<a ng-click="pdtOpen()" class="weui-btn weui-btn_mini weui-btn_default">远程开门</a>
+				</div>
+		</div>
+		<div class="weui-cell weui-cell_link">
+			<a ng-click="ptdRelock()" class="weui-btn weui-btn_mini weui-btn_default">重锁杯门</a>
+			<a ng-click="ptdScshot()" class="weui-btn weui-btn_mini weui-btn_default">截屏</a>
+			<a ng-click="ptdCleError()" class="weui-btn weui-btn_mini weui-btn_default">清除错误</a>
+		</div>
+	</div>
+	<div id="dialogs">
+		<div class="js_dialog" id="door" ng-show="rest">
+			<div class="weui-mask"></div>
+			<div class="weui-dialog p20">
+				<h3 class="fs16">远程重启</h3>
+				<div class="pswCell">
+					<span></span>
+					<input class="txtpsw" type="number" id="rstInput" ng-model="respsw" placeholder="输入密码" />
+				</div>
+				<div class="button-sp-area">
+					<button class="weui-btn weui-btn_mini weui-btn_default" ng-click="pdtRest()">取消</button>
+					<button class="weui-btn weui-btn_mini weui-btn_primary ml10" ng-click="pdtRestSub()">确定</button>
+				</div>
+				
+			</div>
+		</div>
+		<div class="js_dialog" id="door" ng-show="open">
+			<div class="weui-mask"></div>
+			<div class="weui-dialog p20">
+				<h3 class="fs16">远程开门</h3>
+				<div class="pswCell">
+					<span></span>
+					<input class="txtpsw" type="number" id="opdInput" ng-model="txtpsw" placeholder="输入密码" />
+				</div>
+				<div class="button-sp-area">
+					<button class="weui-btn weui-btn_mini weui-btn_default" ng-click="pdtOpen()">取消</button>
+					<button class="weui-btn weui-btn_mini weui-btn_primary ml10" ng-click="pdtOpenSub()">确定</button>
+				</div>
+				
+			</div>
+		</div>
+		<div class="js_dialog" id="door" ng-show="ptdrelock">
+			<div class="weui-mask"></div>
+			<div class="weui-dialog p20">
+				<h3 class="fs16">重锁杯门</h3>
+				<div class="pswCell">
+					<span></span>
+					<input class="txtpsw" type="number" id="reloInput" ng-model="relopsw" placeholder="输入密码" />
+				</div>
+				<div class="button-sp-area">
+					<button class="weui-btn weui-btn_mini weui-btn_default" ng-click="ptdRelock()">取消</button>
+					<button class="weui-btn weui-btn_mini weui-btn_primary ml10" ng-click="ptdRelockSub()">确定</button>
+				</div>			
+			</div>
+		</div>
+		<div class="js_dialog" id="door" ng-show="scshot">
+			<div class="weui-mask" ng-click="scshot=!scshot"></div>
+			<div class="weui-dialog p20">
+				<img src="{{resUrl}}">		
+			</div>
+		</div>
+	</div>
+</div>
