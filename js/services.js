@@ -1,63 +1,3 @@
-"use strict";
-
-var Youcoffee = angular.module("youcoffee",["ngRoute", "ngCookies","infinite-scroll"]);
-
-Youcoffee.config(['$routeProvider',function($routeProvider){
-	var timestamp = Date.parse(new Date());
-	$routeProvider
-	.when("/", {
-    	redirectTo: "/login"
-  	})
-	.when('/login',{
-		templateUrl : 'yy_login.html?t='+timestamp,
-	})
-	.when('/home',{
-		templateUrl : 'yy_home.html?t='+timestamp,
-	})
-	.when('/pointList',{
-		templateUrl : 'yy_point_list.html?t='+timestamp,
-	})
-	.when('/maintainList',{
-		templateUrl: 'yy_maintain_list.html?t='+timestamp,
-	})
-	.when('/reportError/macNo=:macNo',{
-		templateUrl: 'yy_report_error.html?t='+timestamp,
-	})
-
-	.when('/startMaintain/id=:id',{
-		templateUrl:'yy_start_maintain.html?t='+timestamp,
-	})
-    .when('/maintainDetail/id=:id',{
-        templateUrl:'yy_maintain_detail.html?t='+timestamp,
-    })
-    .when('/pointDetail/id=:id',{
-        templateUrl:'yy_point_detail.html?t='+timestamp,
-    })
-    .when('/maintainSheet/MacNo=:MacNo',{
-        templateUrl:'yy_maintain_sheet.html?t='+timestamp,
-    })
-    .when('/reportError',{
-        templateUrl:'yy_report_error.html?t='+timestamp,
-    })
-	.otherwise({redirectTo:'/login'});
-
-}]);
-
- 
-Youcoffee.run(function($rootScope){
-    $rootScope.optionSel=new Array();
-})
-
-
-
- 
-
-//过滤日期
-Youcoffee.filter('dateFormatted',function(){
-    return function(str){
-        return str.substring(5,16);
-    }
-})
 //点击事件实现输入框自动聚焦
 Youcoffee.factory('inputFocus',function($timeout,$window){
     return function(id){
@@ -146,22 +86,31 @@ Youcoffee.service('compressImg', function($q,$timeout) {
     this.after = '';
     this.currIndex=currIndex;
     this.currId=currId;
+    this.tdata=seleData;
   };
 
-  Reddit.prototype.nextPage = function() {
+  Reddit.prototype.nextPage = function(){
+        var data={}; 
+        if(this.tdata){
+            this.tdata.flag=this.currIndex
+            this.tdata.id=this.currId;
+            data=this.tdata;
+        }else{
+            data.flag=this.currIndex;
+            data.id=this.currId;
+        }
         if (this.busy) return;
         this.busy = true;
         $http({
             method:'POST',
             url:'yy_tpl/maintainList.php',
-            data:{flag:this.currIndex,id:this.currId}
+            data:data
         }).then(function successCallback(response){
              if(this.currId==0)return;
               var items=[];
               switch(this.currIndex){
                    case 1:
-                        items=response.data.maintain_all;
-                         
+                        items=response.data.maintain_all;                        
                         this.currId=response.data.maintain_all_id;
                         break;
                     case 2:
@@ -175,7 +124,7 @@ Youcoffee.service('compressImg', function($q,$timeout) {
               }
               for (var i = 0; i < items.length; i++) {
                     if(items[i].MacName.indexOf(']')==-1){
-                        items[i].MacName+='['+items[i].MacNo+']';
+                        items[i].MacName='['+items[i].MacNo+']'+items[i].MacName;
                     } 
                     this.items.push(items[i]);
               }
@@ -196,15 +145,25 @@ Youcoffee.factory('ptLoad', function($http) {
     this.after = '';
     this.currIndex=currIndex;
     this.currId=currId;
+    this.tdata=seleData;
   };
 
-  ptLoad.prototype.nextPage = function() {
+  ptLoad.prototype.nextPage = function(){
+        var data={};
+        if(this.tdata){
+            this.tdata.flag=this.currIndex
+            this.tdata.id=this.currId;
+            data=this.tdata;
+        }else{
+            data.flag=this.currIndex;
+            data.id=this.currId;
+        }
         if (this.busy) return;
         this.busy = true;
         $http({
             method:'POST',
             url:'yy_tpl/pointList.php',
-            data:{flag:this.currIndex,id:this.currId}
+            data:data
         }).then(function successCallback(response){
              if(this.currId==0)return;
               var items=[];
@@ -224,7 +183,7 @@ Youcoffee.factory('ptLoad', function($http) {
               }
               for (var i = 0; i < items.length; i++) {
                 if(items[i].MacName.indexOf(']')==-1){
-                    items[i].MacName+='['+items[i].MacNo+']';
+                    items[i].MacName='['+items[i].MacNo+']'+items[i].MacName;
                 } 
                 this.items.push(items[i]);
               }

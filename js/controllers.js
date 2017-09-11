@@ -3,20 +3,21 @@ Youcoffee.controller('mainNavCtrl',function($scope,$http,$rootScope,$cookieStore
     $scope.selOption_0=function(i){
         $scope.optionSel[0]=i;
         $rootScope.optionSel[0]=i;
-        if(i==3){
+         if(i==3){
            $http({
               method:'POST',
               url:'yy_tpl/logout.php'
            }).then(function successCallback(response){
                console.log(response);
-           },function errorCallback(responses){
+               alert(response.data.tip);
+           },function errorCallback(response){
                console.log(response);
            })
         }
     }
   
 })
-Youcoffee.controller('loginCtrl' , function($scope, $http){
+Youcoffee.controller('loginCtrl' , function($scope, $http,$rootScope,$window){
     $scope.submit = function() {
     var username  = $scope.idLogPhs;
     var password = $scope.idLogPwd;
@@ -30,13 +31,14 @@ Youcoffee.controller('loginCtrl' , function($scope, $http){
     }).then(function successCallback(response) {
         console.log(response);
         if(response.data.code == 200){
-          location.href = response.data.href;
+          $window.location.href = response.data.href;
+          $scope.optionSel[0]=0;
+          $rootScope.optionSel[0]=0;
         }else{
           alert(response.data.tip);
         }
       }, function errorCallback(response){
         // 请求失败执行代码
-        alert('服务器请求失败');
         console.log(response);
     });
   }
@@ -50,9 +52,9 @@ Youcoffee.controller('homeCtrl' , function($scope, $http,$rootScope){
       url:'yy_tpl/home.php'
     }).then(function successCallback(response){
           if(response.data.status == 0){
-            alert(response.data.tip);
             location.href=response.data.href;
           }else{
+            console.log(response);
             new Highcharts.Chart('lineChart', {
                     chart:{
                         height:250,
@@ -123,15 +125,7 @@ Youcoffee.controller('homeCtrl' , function($scope, $http,$rootScope){
               'urge':response.data.maintain.baojin_jinji,
               'pending':response.data.maintain.baojin
             }
-            $scope.saleTotal={
-              qty0:response.data.saleTotal.qty0,
-              qty1:response.data.saleTotal.qty1,
-              qty2:response.data.saleTotal.qty2,
-              qty3:response.data.saleTotal.qty3,
-              qty4:response.data.saleTotal.qty4,
-              cpusAve:response.data.saleTotal.cpusAve,
-              macTotal:response.data.saleTotal.macTotal
-            }  
+            $scope.saleTotal=response.data.saleTotal;
             $scope.detaiList=response.data.detailList;    
           }
           //跳转至维护页面
@@ -157,6 +151,9 @@ Youcoffee.controller('maintainListCtrl',function($scope,$http,Reddit,$timeout,$r
             method:'POST',
             url:'yy_tpl/maintainList.php'
         }).then(function successCallback(response){
+          if(response.data.status == 0){
+            location.href=response.data.href;
+          }else{
             console.log(response);       //获取全部维护清单         
             $scope.maintain_all=response.data.maintain_all;
             $scope.maintain_pending=response.data.maintain_pending;
@@ -240,10 +237,6 @@ Youcoffee.controller('maintainListCtrl',function($scope,$http,Reddit,$timeout,$r
                       method:'POST',
                       url:'yy_tpl/maintainList.php'
                 }).then(function successCallback(response){
-                      if(response.data.status == 0){
-                          alert(response.data.tip);
-                          location.href=response.data.href;
-                      }else{
                         $scope.flag=false;               //下拉列表隐藏与显示
                         $scope.province=[];
                         $scope.toggle=function(){
@@ -262,8 +255,6 @@ Youcoffee.controller('maintainListCtrl',function($scope,$http,Reddit,$timeout,$r
                          for(var i=0;i<$scope.province.length;i++){
                             $scope.province[i].chirldren.unshift($scope.shifCity);
                          }
-
-                      }
                 },function errorCallback(response){
                     console.log(response);
                 })  
@@ -333,12 +324,13 @@ Youcoffee.controller('maintainListCtrl',function($scope,$http,Reddit,$timeout,$r
                         console.log(response);
                       })         
                 }
+             }
             }
-
-            }
+          }
         },function errorCallback(response){
               console.log(response);
         });
+  
         //提交表单，查询相关维护订单
         $scope.submit=function(){
            $scope.tdata={
@@ -366,21 +358,21 @@ Youcoffee.controller('maintainListCtrl',function($scope,$http,Reddit,$timeout,$r
                 $scope.currId=$scope.maintain_all_id;
                 for(var i=0;i<$scope.maintain_all.length;i++){
                     if($scope.maintain_all[i].MacName.indexOf(']')==-1){
-                       $scope. maintain_all[i].MacName+='['+$scope. maintain_all[i].MacNo+']';
+                       $scope. maintain_all[i].MacName='['+$scope. maintain_all[i].MacNo+']'+$scope. maintain_all[i].MacName
                     }
                 }
                 for(var i=0;i<$scope.maintain_pending.length;i++){
                     if($scope.maintain_pending[i].MacName.indexOf(']')==-1){
-                       $scope. maintain_pending[i].MacName+='['+$scope. maintain_pending[i].MacNo+']';
+                       $scope. maintain_pending[i].MacName='['+$scope. maintain_pending[i].MacNo+']'+$scope. maintain_pending[i].MacName;
                     }
                 }
                 for(var i=0;i<$scope.maintain_urgent.length;i++){
                     if($scope.maintain_urgent[i].MacName.indexOf(']')==-1){
-                       $scope. maintain_urgent[i].MacName+='['+$scope. maintain_urgent[i].MacNo+']';
+                       $scope. maintain_urgent[i].MacName='['+$scope. maintain_urgent[i].MacNo+']'+$scope. maintain_urgent[i].MacName;
                     }
                 }
                 //触发滚动事件
-                $scope.reddit=new Reddit($scope.focusIndex,$scope.currId);
+                $scope.reddit=new Reddit($scope.focusIndex,$scope.currId,$scope.tdata);
                 //撤单操作
                 $scope.cancelOrder=function(index){
                     $scope.confirm=confirm('确认撤单？');
@@ -459,7 +451,7 @@ Youcoffee.controller('maintainListCtrl',function($scope,$http,Reddit,$timeout,$r
                         $scope.currId=$scope.maintain_urgent_id;
                        break; 
                }  
-            $scope.reddit=new Reddit($scope.focusIndex,$scope.currId);   
+            $scope.reddit=new Reddit($scope.focusIndex,$scope.currId,$scope.tdata);   
             //撤单操作
             $scope.cancelOrder=function(index){
                 $scope.confirm=confirm('确认撤单？');
@@ -517,8 +509,7 @@ Youcoffee.controller('maintainListCtrl',function($scope,$http,Reddit,$timeout,$r
                 }
             },function errorCallback(response){
               console.log(response);
-            }) 
-               
+            })              
       }
 })
 
@@ -531,6 +522,9 @@ Youcoffee.controller('maintainDetailCtrl',function($scope,$http,$routeParams){
         url:'yy_tpl/maintainDetail.php',
         data:{id:$scope.currID}
       }).then(function successCallback(response){
+          if(response.data.status == 0){
+            location.href=response.data.href;
+          }else{
           console.log(response);
           //填充数据
           $scope.detailData={
@@ -597,6 +591,7 @@ Youcoffee.controller('maintainDetailCtrl',function($scope,$http,$routeParams){
                       })         
                 }
             }
+          }
       },function errorCallback(response){
           console.log(response);
       })
@@ -622,6 +617,9 @@ Youcoffee.controller('startMaintainCtrl',function($scope,$http,$interval,$filter
         url:'yy_tpl/startMaintain.php',
         data:{id:$scope.currID}
       }).then(function successCallback(response){
+          if(response.data.status == 0){
+            location.href=response.data.href;
+          }else{
           console.log(response);
           $scope.MacName=response.data.data.MacName;
           $scope.stock=response.data.data.stock;
@@ -827,6 +825,7 @@ Youcoffee.controller('startMaintainCtrl',function($scope,$http,$interval,$filter
                 })
              } 
           }
+         } 
       },function errorCallback(response){
           console.log(response);
       })
@@ -888,6 +887,9 @@ Youcoffee.controller('maintainSheetCtrl',function($scope,$http,$filter,$routePar
                     ErrorDesc:$scope.ErrorDesc
                   }
                 }).then(function successCallback(response){
+                      if(response.data.status == 0){
+                        location.href=response.data.href;
+                      }else{
                       console.log(response);
                       if(response.data.status==1){
                             alert(response.data.tip);
@@ -897,6 +899,7 @@ Youcoffee.controller('maintainSheetCtrl',function($scope,$http,$filter,$routePar
                       }else{
                         alert(response.data.tip);
                       }
+                    }
                 },function errorCallback(response){
                       console.log(response);
                 })
@@ -936,6 +939,9 @@ Youcoffee.controller('reportErrorCtrl',function($scope,$http,$routeParams,compre
                       headers: {'Content-Type': undefined },  
                       transformRequest: angular.identity
                   }).then(function successCallback(response){
+                      if(response.data.status == 0){
+                        location.href=response.data.href;
+                      }else{
                       console.log(response);         
                       $scope.guid=(new Date()).valueOf();
                       $scope.thumb[$scope.guid]={
@@ -952,6 +958,7 @@ Youcoffee.controller('reportErrorCtrl',function($scope,$http,$routeParams,compre
                           delete $scope.form.image[$scope.guidArr[index]];
                           $scope.count--;
                       }
+                    }
                   },function errorCallback(response){
                       console.log(response);
                   })
@@ -1013,6 +1020,9 @@ Youcoffee.controller('pointListCtrl',function($scope,$http,ptLoad){
             method:'POST',
             url:'yy_tpl/pointList.php'
         }).then(function successCallback(response){
+            if(response.data.status == 0){
+              location.href=response.data.href;
+            }else{
             console.log(response);       //获取全部维护清单         
             $scope.point_all=response.data.point_all;
             $scope.point_normal=response.data.point_normal;
@@ -1024,17 +1034,17 @@ Youcoffee.controller('pointListCtrl',function($scope,$http,ptLoad){
             $scope.currId=$scope.point_all_id;
             for(var i=0;i<$scope.point_all.length;i++){
                 if($scope.point_all[i].MacName.indexOf(']')==-1){
-                   $scope. point_all[i].MacName+='['+$scope. point_all[i].MacNo+']';
+                   $scope. point_all[i].MacName='['+$scope. point_all[i].MacNo+']'+$scope. point_all[i].MacName;
                 }
             }
             for(var i=0;i<$scope.point_normal.length;i++){
                 if($scope.point_normal[i].MacName.indexOf(']')==-1){
-                   $scope. point_normal[i].MacName+='['+$scope. point_normal[i].MacNo+']';
+                   $scope. point_normal[i].MacName='['+$scope. point_normal[i].MacNo+']'+$scope. point_normal[i].MacName;
                 }
             }
             for(var i=0;i<$scope.point_fault.length;i++){
                 if($scope.point_fault[i].MacName.indexOf(']')==-1){
-                   $scope. point_fault[i].MacName+='['+$scope. point_fault[i].MacNo+']';
+                   $scope. point_fault[i].MacName='['+$scope. point_fault[i].MacNo+']'+$scope. point_fault[i].MacName;
                 }
             }
             //触发滚动事件
@@ -1056,10 +1066,6 @@ Youcoffee.controller('pointListCtrl',function($scope,$http,ptLoad){
              }              
               $scope.ptLoad=new ptLoad($scope.focusIndex,$scope.currId);  
             }
-        },function errorCallback(response){
-              console.log(response);
-        });
-      
         $scope.flag=false;
         $scope.toggle=function(){
           $scope.flag=!$scope.flag;
@@ -1069,24 +1075,19 @@ Youcoffee.controller('pointListCtrl',function($scope,$http,ptLoad){
               method:'POST',
               url:'yy_tpl/pointList.php'
         }).then(function successCallback(response){
-              if(response.data.status == 0){
-                  alert(response.data.tip);
-                  location.href=response.data.href;
-              }else{
-                  //加载省市下拉列表
-                 $scope.province=response.data.ProvinceList;
-                 $scope.allPro={
-                      Province:"全部",
-                      chirldren:[]
-                 }
-                 $scope.shifCity={
-                    City:'全部'
-                 }
-                 $scope.province.unshift($scope.allPro);
-                 for(var i=0;i<$scope.province.length;i++){
-                    $scope.province[i].chirldren.unshift($scope.shifCity);
-                 }
-              }
+              //加载省市下拉列表
+             $scope.province=response.data.ProvinceList;
+             $scope.allPro={
+                  Province:"全部",
+                  chirldren:[]
+             }
+             $scope.shifCity={
+                City:'全部'
+             }
+             $scope.province.unshift($scope.allPro);
+             for(var i=0;i<$scope.province.length;i++){
+                $scope.province[i].chirldren.unshift($scope.shifCity);
+             }          
         },function errorCallback(response){
             console.log(response);
         })
@@ -1098,6 +1099,7 @@ Youcoffee.controller('pointListCtrl',function($scope,$http,ptLoad){
                 MaintainName:$scope.mtStuff,
                 Key:$scope.pointInfo
             } 
+            console.log($scope.tdata);
             $scope.flag=!$scope.flag;
             $http({
                method:'POST',
@@ -1131,7 +1133,7 @@ Youcoffee.controller('pointListCtrl',function($scope,$http,ptLoad){
                     }
                 }
                 //触发滚动事件
-                $scope.ptLoad=new ptLoad($scope.focusIndex,$scope.currId);  
+                $scope.ptLoad=new ptLoad($scope.focusIndex,$scope.currId,$scope.tdata);  
             //动态选择导航栏
             $scope.navSwitch=function(index,currId){
                 $scope.focusIndex=index;
@@ -1146,7 +1148,7 @@ Youcoffee.controller('pointListCtrl',function($scope,$http,ptLoad){
                         $scope.currId=$scope.point_fault_id;
                        break; 
                }        
-            $scope.ptLoad=new ptLoad($scope.focusIndex,$scope.currId);        
+            $scope.ptLoad=new ptLoad($scope.focusIndex,$scope.currId,$scope.tdata);        
             }             
             $scope.flag=false;
             $scope.toggle=function(){
@@ -1155,8 +1157,11 @@ Youcoffee.controller('pointListCtrl',function($scope,$http,ptLoad){
             },function errorCallback(response){
               console.log(response);
             }) 
-               
-      }
+         }
+        }  
+      },function errorCallback(response){
+            console.log(response);
+      });   
 })
 
 
@@ -1170,6 +1175,9 @@ Youcoffee.controller('pointDetailCtrl',function($http,$scope,$routeParams,inputF
       url:'yy_tpl/pointDetail.php',
       data:{id:$routeParams.id}
     }).then(function(response){
+        if(response.data.status == 0){
+            location.href=response.data.href;
+        }else{
         console.log(response);
         $scope.MacName=response.data.data.MacName;
         $scope.stock=response.data.data.stock;
@@ -1289,9 +1297,9 @@ Youcoffee.controller('pointDetailCtrl',function($http,$scope,$routeParams,inputF
             })
           }
 
+        }
 
-
-    },function(response){
+    },function errorCallback(response){
         console.log(response);
     })
 })
